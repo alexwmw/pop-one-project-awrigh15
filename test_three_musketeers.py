@@ -41,12 +41,17 @@ def test_string_to_location():
     #test with correct inputs
 
 def test_location_to_string():
-    # Replace with tests
+    with pytest.raises(ValueError):
+        location_to_string((0,7))
+    assert location_to_string((0,0)) == 'A1'
+    # First test added
 
 def test_at():
-    # Replace with tests
+    assert at((0,3)) == M 
+    # First test added
 
 def test_all_locations():
+    assert all_locations == 
     # Replace with tests
 
 def test_adjacent_location():
