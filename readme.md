@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
     <h1>Purposes of this assignment is to give you experience of the following:</h1>
     <ul>
