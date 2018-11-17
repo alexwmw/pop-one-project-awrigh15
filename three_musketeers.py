@@ -158,12 +158,12 @@ def print_board():
 def print_instructions():
     print()
     print("""To make a move, enter the location of the piece you want to move,
-and the direction you want it to move. Locations are indicated as a
-letter (A, B, C, D, or E) followed by an integer (1, 2, 3, 4, or 5).
-Directions are indicated as left, right, up, or down (or simply L, R,
-U, or D). For example, to move the Musketeer from the top right-hand
-corner to the row below, enter 'A5 left' (without quotes).
-For convenience in typing, you may use lowercase letters.""")
+    and the direction you want it to move. Locations are indicated as a
+    letter (A, B, C, D, or E) followed by an integer (1, 2, 3, 4, or 5).
+    Directions are indicated as left, right, up, or down (or simply L, R,
+    U, or D). For example, to move the Musketeer from the top right-hand
+    corner to the row below, enter 'A5 left' (without quotes).
+    For convenience in typing, you may use lowercase letters.""")
     print()
 
 def choose_users_side():

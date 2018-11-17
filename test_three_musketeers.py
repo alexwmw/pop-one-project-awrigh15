@@ -51,17 +51,37 @@ def test_at():
     # First test added
 
 def test_all_locations():
-    assert all_locations == 
-    # Replace with tests
+    assert all_locations == [
+                            (0,0),(0,1),(0,2),(0,3),(0,4),
+                            (1,0),(1,1),(1,2),(1,3),(1,4),
+                            (2,0),(2,1),(2,2),(2,3),(2,4),
+                            (3,0),(3,1),(3,2),(3,3),(3,4),
+                            (4,0),(4,1),(4,2),(4,3),(4,4) ]
+    # Test added
 
 def test_adjacent_location():
-    # Replace with tests
-    
+    assert adjacent_location((1,2),right) == (1,3)
+    assert adjacent_location((2,2),down) == (3,2)
+    assert adjacent_location((1,2),left) == (1,1)
+    assert adjacent_location((3,2),up) == (2,2)
+    # Four tests added
+
+
 def test_is_legal_move_by_musketeer():
-    # Replace with tests
+    with pytest.raises(ValueError):
+        at(3,0)
+    assert is_legal_move_by_musketeer((1,3),down) == True
+    assert is_legal_move_by_musketeer((2,2),down) == False
+    # Tests added
+    # Check use of .raises
     
 def test_is_legal_move_by_enemy():
-    # Replace with tests
+    with pytest.raises(ValueError):
+        at(0,3)
+    assert is_legal_move_by_enemy((1,2),left) == True
+    assert is_legal_move_by_enemy((2,3),up) == False
+    # Tests added
+    # Check use of .raises
 
 def test_is_legal_move():
     # Replace with tests
