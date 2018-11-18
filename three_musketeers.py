@@ -91,7 +91,6 @@ def can_move_piece_at(location):
     You can assume that input will always be in correct range."""
     pass # Replace with code
 
-
 def has_some_legal_move_somewhere(who):
     """Tests whether a legal move exists for player "who" (which must
     be either 'M' or 'R'). Does not provide any information on where
@@ -110,12 +109,12 @@ def is_legal_location(location):
     """Tests if the location is legal on a 5x5 board.
     You can assume that input will always be a pair of integers."""
     pass # Replace with code
-    
+
 def is_within_board(location, direction):
     """Tests if the move stays within the boundaries of the board.
     You can assume that input will always be in correct range."""
     pass # Replace with code
-    
+
 def all_possible_moves_for(player):
     """Returns every possible move for the player ('M' or 'R') as a list
        (location, direction) tuples.
@@ -178,7 +177,7 @@ def choose_users_side():
 
 def get_users_move():
     """Gets a legal move from the user, and returns it as a
-       (location, direction) tuple."""    
+       (location, direction) tuple."""
     directions = {'L':'left', 'R':'right', 'U':'up', 'D':'down'}
     move = input("Your move? ").upper().replace(' ', '')
     if (len(move) >= 3
@@ -205,10 +204,10 @@ def move_musketeer(users_side):
             print("You can't move there!")
             return move_musketeer(users_side)
     else: # Computer plays Musketeer
-        (location, direction) = choose_computer_move('M')         
+        (location, direction) = choose_computer_move('M')
         make_move(location, direction)
         describe_move("Musketeer", location, direction)
-        
+
 def move_enemy(users_side):
     """Gets the enemy's move (from either the user or the computer)
        and makes it."""
@@ -222,7 +221,7 @@ def move_enemy(users_side):
             print("You can't move there!")
             return move_enemy(users_side)
     else: # Computer plays enemy
-        (location, direction) = choose_computer_move('R')         
+        (location, direction) = choose_computer_move('R')
         make_move(location, direction)
         describe_move("Enemy", location, direction)
         return board
