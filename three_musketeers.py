@@ -186,7 +186,6 @@ def all_possible_moves_for(player):
                     if is_legal_move(location, direction) and is_within_board(location, direction):
                         possible_moves.append((location, direction))
     return possible_moves
-    # Stub
 
 def make_move(location, direction):
     """Moves the piece in location in the indicated direction.
@@ -197,7 +196,6 @@ def make_move(location, direction):
     (new_row, new_column) = adjacent_location(location, direction)
     board[row][column], board[new_row][new_column] = '-', at(location)
     return board
-
 
 def choose_computer_move(who):
     """The computer chooses a move for a Musketeer (who = 'M') or an
@@ -210,7 +208,6 @@ def choose_computer_move(who):
     while not is_legal_move(location, direction) and not is_within_board(location, direction):
         location, direction = random.choice(all_possible_moves_for(who))
     return (location, direction)
-
 
 def is_enemy_win():
     """Returns True if all 3 Musketeers are in the same row or column."""
@@ -227,7 +224,6 @@ def is_enemy_win():
         else:
             M_in_row, M_in_column = 0, 0
     return False
-
 
 #---------- Communicating with the user ----------
 #----you do not need to modify code below unless you find a bug
