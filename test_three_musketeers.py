@@ -153,22 +153,35 @@ def test_make_move():
                   [_,  _,  _,  R,  _] ]
     assert get_board() == new_board
 
-    # One test added
+    # One test passed
 
 def test_choose_computer_move():
     set_board(board1)
-    assert is_legal_move_by_musketeer(choose_computer_move(M), left) == True
-    assert is_legal_move_by_enemy(choose_computer_move(R), left) == True
-    # This one is confusing; M and R tests added using is_legal_move_by_*
+    location, direction = choose_computer_move(M)
+    assert is_legal_move_by_musketeer(location, direction) and is_within_board(location, direction)
+    location, direction = choose_computer_move(R)
+    assert is_legal_move_by_enemy(location, direction) and is_within_board(location, direction)
+
+
 
 def test_is_enemy_win():
     set_board(board1)
-    assert is_enemy_win == False
-    boardMMM = [ [_,  _,  _,  M,  _],
+    assert is_enemy_win() == False
+
+    row_win = [ [_,  _,  _,  _,  _],
+                 [_,  _,  R,  _,  _],
+                 [_,  R,  M,  M,  M],
+                 [_,  R,  _,  _,  _],
+                 [_,  _,  _,  R,  _] ]
+    set_board(row_win)
+    assert is_enemy_win() == True
+
+
+    column_win = [ [_,  _,  _,  M,  _],
                  [_,  _,  R,  M,  _],
                  [_,  R,  _,  M,  _],
                  [_,  R,  _,  _,  _],
                  [_,  _,  _,  R,  _] ]
-    set_board(boardMMM)
-    assert is_enemy_win == True
-    # Tests added using board1 and 'boardMMM'
+    set_board(column_win)
+    assert is_enemy_win() == True
+    # Tests passed

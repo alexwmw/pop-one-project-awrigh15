@@ -192,21 +192,42 @@ def make_move(location, direction):
     """Moves the piece in location in the indicated direction.
     Doesn't check if the move is legal. You can assume that input will always
     be in correct range."""
-    return create_board()
-    # Stub
+    board = get_board()
+    (row, column) = location
+    (new_row, new_column) = adjacent_location(location, direction)
+    board[row][column], board[new_row][new_column] = '-', at(location)
+    return board
+
 
 def choose_computer_move(who):
     """The computer chooses a move for a Musketeer (who = 'M') or an
        enemy (who = 'R') and returns it as the tuple (location, direction),
        where a location is a (row, column) tuple as usual.
        You can assume that input will always be in correct range."""
-    return ((0, 0), 'left')
-    # Stub
+    import random
+    location, direction = random.choice(all_possible_moves_for(who))
+
+    while not is_legal_move(location, direction) and not is_within_board(location, direction):
+        location, direction = random.choice(all_possible_moves_for(who))
+    return (location, direction)
+
 
 def is_enemy_win():
     """Returns True if all 3 Musketeers are in the same row or column."""
-    return True
-    # Stub
+    M_in_row = 0
+    M_in_column = 0
+    for i in range(5):
+        for j in range(5):
+            if at((i, j)) == 'M':
+                M_in_row += 1
+            if at((j, i)) == 'M':
+                M_in_column += 1
+        if M_in_row == 3 or M_in_column == 3:
+            return True
+        else:
+            M_in_row, M_in_column = 0, 0
+    return False
+
 
 #---------- Communicating with the user ----------
 #----you do not need to modify code below unless you find a bug
