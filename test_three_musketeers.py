@@ -44,7 +44,6 @@ def test_string_to_location():
     #test with correct inputs
 
 def test_location_to_string():
-    set_board(board1)
     with pytest.raises(ValueError):
         location_to_string((0,7))
     assert location_to_string((0,0)) == 'A1'
@@ -157,25 +156,20 @@ def test_all_possible_moves_for():
 
 def test_make_move():
     set_board(board1)
-    make_move((2,2),left)
-    assert board == [   [_, _, _, M, _],
-                        [_, _, R, M, _],
-                        [_, M, _, R, _],
-                        [_, R, _, _, _],
-                        [_, _, _, R, _] ]
-    set_board(board1)
-    make_move((3,1),down)
-    assert board == [   [_, _, _, M, _],
-                        [_, _, R, M, _],
-                        [_, R, M, R, _],
-                        [_, _, _, _, _],
-                        [_, R, _, R, _] ]
-    # Two tests added (with legal moves)
+    make_move((3,1),left)
+    new_board = [ [_, _, _, M, _],
+                  [_, _, R, M, _],
+                  [_, R, M, R, _],
+                  [R, _, _, _, _],
+                  [_, _, _, R, _] ]
+    assert get_board() == new_board
+
+    # One test added
 
 def test_choose_computer_move():
     set_board(board1)
-    assert is_legal_move_by_musketeer(choose_computer_move(M)) == True
-    assert is_legal_move_by_enemy(choose_computer_move(R)) == True
+    assert is_legal_move_by_musketeer(choose_computer_move(M),left) == True
+    assert is_legal_move_by_enemy(choose_computer_move(R),left) == True
     # This one is confusing; M and R tests added using is_legal_move_by_*
 
 def test_is_enemy_win():

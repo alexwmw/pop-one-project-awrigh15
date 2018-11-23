@@ -112,7 +112,7 @@ def possible_moves_from(location):
        for the player at location to move. If there is no player at
        location, returns the empty list, [].
        You can assume that input will always be in correct range."""
-    return [left]
+    return ['left']
     # Stub
 
 def is_legal_location(location):
@@ -131,14 +131,14 @@ def all_possible_moves_for(player):
     """Returns every possible move for the player ('M' or 'R') as a list
        (location, direction) tuples.
        You can assume that input will always be in correct range."""
-    return [((0 ,0), left),((0,0), up)]
+    return [((0 ,0), 'left'),((0,0), 'up')]
     # Stub
 
 def make_move(location, direction):
     """Moves the piece in location in the indicated direction.
     Doesn't check if the move is legal. You can assume that input will always
     be in correct range."""
-    return board
+    create_board()
     # Stub
 
 def choose_computer_move(who):
@@ -146,7 +146,7 @@ def choose_computer_move(who):
        enemy (who = 'R') and returns it as the tuple (location, direction),
        where a location is a (row, column) tuple as usual.
        You can assume that input will always be in correct range."""
-    return ((0, 0) left)
+    return ((0, 0), 'left')
     # Stub
 
 def is_enemy_win():
