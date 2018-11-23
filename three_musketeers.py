@@ -42,16 +42,25 @@ def string_to_location(s):
        is outside of the correct range (between 'A' and 'E' for s[0] and
        between '1' and '5' for s[1]
        """
-    return (0, 0)
-    # Stub
+    row = ord(s[0])-65 # ascii value of s[0]; minus 65 puts value in correct range
+    column = int(s[1])-1
+    r = range(0,5)
+    if row not in r or column not in r:
+        raise ValueError()
+    else:
+        return (row, column)
 
 def location_to_string(location):
     """Returns the string representation of a location.
-    Similarly to the previous function, this function should raise
-    ValueError exception if the input is outside of the correct range
-    """
-    return ("A1")
-    # Stub
+       Similarly to the previous function, this function should raise
+       ValueError exception if the input is outside of the correct range
+       """
+    s = (chr(location[0]+65)+str(location[1]+1))
+    r = range(0,5)
+    if location[0] not in r or location[1] not in r:
+        raise ValueError()
+    else:
+        return s
 
 def at(location):
     """Returns the contents of the board at the given location.
@@ -60,44 +69,71 @@ def at(location):
 
 def all_locations():
     """Returns a list of all 25 locations on the board."""
-    return []
-    # Stub
+    locations = []
+    for y in range (5):
+        for x in range(5):
+            locations.append((y,x))
+    return locations
 
 def adjacent_location(location, direction):
     """Return the location next to the given one, in the given direction.
        Does not check if the location returned is legal on a 5x5 board.
        You can assume that input will always be in correct range."""
     (row, column) = location
-    return (0, 0)
-    # Stub
+    if direction == "up":
+        row -= 1
+    if direction == "down":
+        row += 1
+    if direction == "left":
+        column -= 1
+    if direction == "right":
+        column += 1
+    return (row, column)
 
 def is_legal_move_by_musketeer(location, direction):
     """Tests if the Musketeer at the location can move in the direction.
-    You can assume that input will always be in correct range. Raises
-    ValueError exception if at(location) is not 'M'"""
-    return False
-    # Stub
+       You can assume that input will always be in correct range. Raises
+       ValueError exception if at(location) is not 'M'"""
+    if at(location) != 'M':
+        raise ValueError()
+    elif at(adjacent_location(location,direction)) == "R":
+        return True
+    else:
+        return False
 
 def is_legal_move_by_enemy(location, direction):
     """Tests if the enemy at the location can move in the direction.
-    You can assume that input will always be in correct range. Raises
-    ValueError exception if at(location) is not 'R'"""
-    return False
-    # Stub
+       You can assume that input will always be in correct range. Raises
+       ValueError exception if at(location) is not 'R'"""
+    if at(location) != 'R':
+        raise ValueError()
+    elif at(adjacent_location(location,direction)) == "-":
+        return True
+    else:
+        return False
 
 def is_legal_move(location, direction):
     """Tests whether it is legal to move the piece at the location
     in the given direction.
     You can assume that input will always be in correct range."""
-    return False
-    # Stub
+    if at(location) == 'M':
+        return is_legal_move_by_musketeer(location, direction)
+    elif at(location) == 'R':
+        return is_legal_move_by_enemy(location, direction)
+    else:
+        return False
 
 def can_move_piece_at(location):
     """Tests whether the player at the location has at least one move available.
     You can assume that input will always be in correct range.
     You can assume that input will always be in correct range."""
+    directions = ["up","down","left","right"]
+    for direction in directions:
+        if is_legal_move(location, direction):
+            return True
+        else:
+            continue
     return False
-    # Stub
 
 def has_some_legal_move_somewhere(who):
     """Tests whether a legal move exists for player "who" (which must
