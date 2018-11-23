@@ -42,22 +42,21 @@ def string_to_location(s):
        is outside of the correct range (between 'A' and 'E' for s[0] and
        between '1' and '5' for s[1]
        """
-    row = ord(s[0])-65 # ascii value of s[0]; minus 65 puts value in correct range
-    column = int(s[1])-1
-    r = range(0,5)
-    if row not in r or column not in r:
+    row = ord(s[0]) - 65 # unicode value of s[0]; minus 65 puts value in correct range
+    column = int(s[1]) - 1
+    location = (row, column)
+    if not is_legal_location(location):
         raise ValueError()
     else:
-        return (row, column)
+        return (location)
 
 def location_to_string(location):
     """Returns the string representation of a location.
        Similarly to the previous function, this function should raise
        ValueError exception if the input is outside of the correct range
        """
-    s = (chr(location[0]+65)+str(location[1]+1))
-    r = range(0,5)
-    if location[0] not in r or location[1] not in r:
+    s = (chr(location[0] + 65) + str(location[1] + 1))
+    if not is_legal_location(location):
         raise ValueError()
     else:
         return s
@@ -70,9 +69,9 @@ def at(location):
 def all_locations():
     """Returns a list of all 25 locations on the board."""
     locations = []
-    for y in range (5):
-        for x in range(5):
-            locations.append((y,x))
+    for row in range (5):
+        for column in range(5):
+            locations.append((row, column))
     return locations
 
 def adjacent_location(location, direction):
@@ -107,7 +106,7 @@ def is_legal_move_by_enemy(location, direction):
        ValueError exception if at(location) is not 'R'"""
     if at(location) != 'R':
         raise ValueError()
-    elif at(adjacent_location(location,direction)) == "-":
+    elif at(adjacent_location(location, direction)) == "-":
         return True
     else:
         return False
@@ -137,44 +136,63 @@ def can_move_piece_at(location):
 
 def has_some_legal_move_somewhere(who):
     """Tests whether a legal move exists for player "who" (which must
-    be either 'M' or 'R'). Does not provide any information on where
-    the legal move is.
-    You can assume that input will always be in correct range."""
+       be either 'M' or 'R'). Does not provide any information on where
+       the legal move is.
+       You can assume that input will always be in correct range."""
+    for row in range(5):
+        for column in range(5):
+            if can_move_piece_at((row, column)):
+                if at((row, column)) == who:
+                    return True
     return False
-    # Stub
 
 def possible_moves_from(location):
     """Returns a list of directions ('left', etc.) in which it is legal
        for the player at location to move. If there is no player at
        location, returns the empty list, [].
        You can assume that input will always be in correct range."""
-    return ['left']
-    # Stub
+    directions = ["up","down","left","right"]
+    legal_directions = []
+    for direction in directions:
+        if is_legal_move(location, direction):
+            legal_directions.append(direction)
+    return legal_directions
 
 def is_legal_location(location):
     """Tests if the location is legal on a 5x5 board.
     You can assume that input will always be a pair of integers."""
-    return False
-    # Stub
+    r = range(0, 4)
+    if location[0] not in r or location[1] not in r:
+        return False
+    else:
+        return True
 
 def is_within_board(location, direction):
     """Tests if the move stays within the boundaries of the board.
     You can assume that input will always be in correct range."""
-    return False
-    # Stub
+    return is_legal_location(adjacent_location(location,direction))
 
 def all_possible_moves_for(player):
     """Returns every possible move for the player ('M' or 'R') as a list
        (location, direction) tuples.
        You can assume that input will always be in correct range."""
-    return [((0 ,0), 'left'),((0,0), 'up')]
+    possible_moves = []
+    directions = ["up","down","left","right"]
+    for row in range(5):
+        for column in range(5):
+            location = (row, column)
+            if at(location) == player:
+                for direction in directions:
+                    if is_legal_move(location, direction) and is_within_board(location, direction):
+                        possible_moves.append((location, direction))
+    return possible_moves
     # Stub
 
 def make_move(location, direction):
     """Moves the piece in location in the indicated direction.
     Doesn't check if the move is legal. You can assume that input will always
     be in correct range."""
-    create_board()
+    return create_board()
     # Stub
 
 def choose_computer_move(who):
