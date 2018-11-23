@@ -42,7 +42,7 @@ def string_to_location(s):
        is outside of the correct range (between 'A' and 'E' for s[0] and
        between '1' and '5' for s[1]
        """
-    return (0, 4)
+    return (0, 0)
     # Stub
 
 def location_to_string(location):
@@ -50,7 +50,7 @@ def location_to_string(location):
     Similarly to the previous function, this function should raise
     ValueError exception if the input is outside of the correct range
     """
-    return (A1)
+    return ("A1")
     # Stub
 
 def at(location):
