@@ -95,10 +95,12 @@ def is_legal_move_by_musketeer(location, direction):
        ValueError exception if at(location) is not 'M'"""
     if at(location) != 'M':
         raise ValueError()
-    elif at(adjacent_location(location,direction)) == "R":
+    elif is_within_board(location,direction) and at(adjacent_location(location,direction)) == "R":
         return True
     else:
         return False
+
+
 
 def is_legal_move_by_enemy(location, direction):
     """Tests if the enemy at the location can move in the direction.
@@ -106,10 +108,11 @@ def is_legal_move_by_enemy(location, direction):
        ValueError exception if at(location) is not 'R'"""
     if at(location) != 'R':
         raise ValueError()
-    elif at(adjacent_location(location, direction)) == "-":
+    elif is_within_board(location,direction) and at(adjacent_location(location, direction)) == "-":
         return True
     else:
         return False
+
 
 def is_legal_move(location, direction):
     """Tests whether it is legal to move the piece at the location
@@ -161,7 +164,7 @@ def possible_moves_from(location):
 def is_legal_location(location):
     """Tests if the location is legal on a 5x5 board.
     You can assume that input will always be a pair of integers."""
-    r = range(0, 4)
+    r = range(0, 5)
     if location[0] not in r or location[1] not in r:
         return False
     else:
