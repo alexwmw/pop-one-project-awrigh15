@@ -95,7 +95,8 @@ def is_legal_move_by_musketeer(location, direction):
        ValueError exception if at(location) is not 'M'"""
     if at(location) != 'M':
         raise ValueError()
-    elif is_within_board(location,direction) and at(adjacent_location(location,direction)) == "R":
+    elif (is_within_board(location,direction)
+            and at(adjacent_location(location,direction)) == "R"):
         return True
     else:
         return False
@@ -108,7 +109,8 @@ def is_legal_move_by_enemy(location, direction):
        ValueError exception if at(location) is not 'R'"""
     if at(location) != 'R':
         raise ValueError()
-    elif is_within_board(location,direction) and at(adjacent_location(location, direction)) == "-":
+    elif (is_within_board(location,direction)
+            and at(adjacent_location(location, direction)) == "-"):
         return True
     else:
         return False
@@ -179,6 +181,11 @@ def all_possible_moves_for(player):
     """Returns every possible move for the player ('M' or 'R') as a list
        (location, direction) tuples.
        You can assume that input will always be in correct range."""
+    """Code below iterates through every location on the board.
+       Checks whether the given player ('M' or 'R') is in that location.
+       Then iterates through each direction and check is that move would
+       be legal and within board. If so, it adds that move to a list of
+       possible moves. Then returns the list."""
     possible_moves = []
     directions = ["up","down","left","right"]
     for row in range(5):
@@ -186,18 +193,22 @@ def all_possible_moves_for(player):
             location = (row, column)
             if at(location) == player:
                 for direction in directions:
-                    if is_legal_move(location, direction) and is_within_board(location, direction):
+                    if (is_legal_move(location, direction)
+                            and is_within_board(location, direction)):
                         possible_moves.append((location, direction))
     return possible_moves
 
 def make_move(location, direction):
     """Moves the piece in location in the indicated direction.
-    Doesn't check if the move is legal. You can assume that input will always
-    be in correct range."""
+       Doesn't check if the move is legal. You can assume that input will always
+       be in correct range."""
     board = get_board()
-    (row, column) = location
+    # Create (row, column) tuple for the location of the piece.
+    (piece_row, piece_column) = location
+    # Create another (row, column) tuple for the proposed location.
     (new_row, new_column) = adjacent_location(location, direction)
-    board[row][column], board[new_row][new_column] = '-', at(location)
+    # Then place piece in the new location and replace it with blank space.
+    board[piece_row][piece_column], board[new_row][new_column] = '-', at(location)
     return board
 
 def choose_computer_move(who):
@@ -207,25 +218,32 @@ def choose_computer_move(who):
        You can assume that input will always be in correct range."""
     import random
     location, direction = random.choice(all_possible_moves_for(who))
-
-    while not is_legal_move(location, direction) and not is_within_board(location, direction):
+    while (not is_legal_move(location, direction)
+            and not is_within_board(location, direction)):
         location, direction = random.choice(all_possible_moves_for(who))
     return (location, direction)
 
 def is_enemy_win():
     """Returns True if all 3 Musketeers are in the same row or column."""
+    # Initialise two counting variables
     M_in_row = 0
     M_in_column = 0
+    # Interate through every row place/column place, updating count if M is found.
     for i in range(5):
         for j in range(5):
+            # i is row, j is column
             if at((i, j)) == 'M':
                 M_in_row += 1
+            # j is row, i is column
             if at((j, i)) == 'M':
                 M_in_column += 1
+    # At the end of the row/column, if either count equals 3, return True
+    # Otherwise reset the counters before checking the next row/column
         if M_in_row == 3 or M_in_column == 3:
             return True
         else:
             M_in_row, M_in_column = 0, 0
+    # If not yet returned, return False
     return False
 
 #---------- Communicating with the user ----------
