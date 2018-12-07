@@ -15,6 +15,19 @@ board1 =  [ [_,  _,  _,  M,  _],
             [_,  R,  _,  _,  _],
             [_,  _,  _,  R,  _] ]
 
+board2 =  [ [M,  _,  _,  _,  _],
+            [R,  _,  _,  R,  _],
+            [R,  _,  _,  R,  R],
+            [_,  M,  _,  _,  M],
+            [_,  _,  R,  R,  _] ]
+
+board3 =  [ [_,  _,  _,  _,  _],
+            [_,  _,  R,  R,  _],
+            [_,  R,  _,  M,  _],
+            [_,  R,  R,  M,  _],
+            [_,  _,  _,  M,  _] ]
+
+
 # A musketeer M can move to any orthogonal space occupied by an enemy
 # An enemy R can move to any orthogonal empty space
 
@@ -22,40 +35,71 @@ def test_create_board():
     create_board()
     assert at((0, 0)) == R
     assert at((0, 4)) == M
-    #eventually add at least two more test cases
+    assert at((2,2)) == M
+    assert at((4,0)) == M
+    assert at((1,3)) == R
+    #Five test cases
 
 def test_set_board():
     set_board(board1)
     assert at((0, 0)) == _
     assert at((1, 2)) == R
     assert at((1, 3)) == M
-    #eventually add some board2 and at least 3 tests with it
+    set_board(board2)
+    assert at((0, 0)) == M
+    assert at((1, 1)) == _
+    assert at((4, 3)) == R
+    set_board(board3)
+    assert at((0, 4)) == _
+    assert at((1, 3)) == R
+    assert at((3, 3)) == M
+    #Three boards tested
 
 def test_get_board():
     set_board(board1)
     assert board1 == get_board()
-    #eventually add at least one more test with another board
+    set_board(board2)
+    assert board2 == get_board()
+    set_board(board3)
+    assert board3 == get_board()
+    #Three boards tested
 
 def test_string_to_location():
     with pytest.raises(ValueError):
         string_to_location('X3')
+    with pytest.raises(ValueError):
+        string_to_location('A6')
+    with pytest.raises(ValueError):
+        string_to_location('F1')
     assert string_to_location('A1') == (0, 0)
-    #eventually add at least one more exception test and two more
-    #test with correct inputs
+    assert string_to_location('D2') == (3, 1)
+    assert string_to_location('E5') == (4, 4)
     # First test passed
+    # More ValueError and assert tests added
 
 def test_location_to_string():
     #
     with pytest.raises(ValueError):
         location_to_string((0, 7))
-    assert location_to_string((0, 0)) == 'A1'
+    with pytest.raises(ValueError):
+        location_to_string((4, 5))
+    assert location_to_string((0, 3)) == 'A4'
+    assert location_to_string((3, 4)) == 'D5'
+    assert location_to_string((4, 0)) == 'E1'
     # First test passed
+    # More ValueError and assert tests added
+
 
 
 def test_at():
     set_board(board1)
     assert at((0, 3)) == M
+    assert at((2, 4)) == _
+    set_board(board2)
+    assert at((1, 1)) == _
+    assert at((4, 2)) == R
     # First test passed
+    # Five more tests added across two boards
 
 def test_all_locations():
     list_of_locations = [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (3, 0), (3, 1), (3, 2), (3, 3), (3, 4), (4, 0), (4, 1), (4, 2), (4, 3), (4, 4)]
@@ -68,26 +112,54 @@ def test_adjacent_location():
     assert adjacent_location((1, 2), left) == (1, 1)
     assert adjacent_location((3, 2), up) == (2, 2)
     # Four tests passed
-    # Neither function nor tests check if location is legal
 
 def test_is_legal_move_by_musketeer():
     set_board(board1)
     with pytest.raises(ValueError):
-        is_legal_move_by_musketeer((3, 0), down)
-        # Piece at 3, 0 is _,  not M
-    assert is_legal_move_by_musketeer((1, 3), down) == True
-    assert is_legal_move_by_musketeer((2, 2), down) == False
-    #assert is_legal_move_by_musketeer((0, 3), up) == False
-    # Tests passed; add edge cases
+        is_legal_move_by_musketeer((3, 0), down)    # Piece at 3, 0 is _
+    with pytest.raises(ValueError):
+        is_legal_move_by_musketeer((2, 1), right)   # Piece at 1, 3 is R
+    assert is_legal_move_by_musketeer((2, 2), down) == False    # is _
+    assert is_legal_move_by_musketeer((2, 2), up) == True       # is R
+    assert is_legal_move_by_musketeer((2, 2), left) == True     # is R
+    assert is_legal_move_by_musketeer((2, 2), right) == True    # is R
+    assert is_legal_move_by_musketeer((1, 3), left) == True     # is R
+    set_board(board2)
+    assert is_legal_move_by_musketeer((3, 4), right) == False   # out of bounds
+    assert is_legal_move_by_musketeer((3, 4), up) == True       # is R
+    assert is_legal_move_by_musketeer((3, 1), down) == False    # is _
+    assert is_legal_move_by_musketeer((3, 1), left) == False    # is _
+    assert is_legal_move_by_musketeer((3, 1), right) == False   # is _
+    set_board(board3)
+    assert is_legal_move_by_musketeer((4, 3), up) == False      # is M
+    assert is_legal_move_by_musketeer((4, 3), down) == False    # out of bound
+    assert is_legal_move_by_musketeer((4, 3), left) == False    # is _
+    assert is_legal_move_by_musketeer((3, 3), left) == True     # is R
+    assert is_legal_move_by_musketeer((3, 3), right) == False   # is _
+    assert is_legal_move_by_musketeer((0, 3), up) == False      # out of bound
+    #First tests passed
+    #More cases added
 
 def test_is_legal_move_by_enemy():
     set_board(board1)
     with pytest.raises(ValueError):
-        is_legal_move_by_enemy((0, 3), left)
-        # Piece at 0, 3 is M,  not R
-    assert is_legal_move_by_enemy((1, 2), left) == True
-    assert is_legal_move_by_enemy((2, 3), up) == False
-    # Tests passed; add edge cases
+        is_legal_move_by_enemy((0, 3), left)    # Piece at 0, 3 is M
+    with pytest.raises(ValueError):
+        is_legal_move_by_enemy((4, 1), left)    # Piece at 0, 3 is _
+    assert is_legal_move_by_enemy((1, 2), left) == True         # is _
+    assert is_legal_move_by_enemy((2, 3), up) == False          # is M
+    assert is_legal_move_by_enemy((2, 3), left) == False        # is M
+    assert is_legal_move_by_enemy((2, 3), down) == True         # is _
+    assert is_legal_move_by_enemy((2, 3), right) == True        # is _
+    set_board(board2)
+    assert is_legal_move_by_enemy((4, 3), down) == False        # out of bounds
+    assert is_legal_move_by_enemy((4, 3), up) == True           # is _
+    assert is_legal_move_by_enemy((4, 3), right) == True        # is _
+    assert is_legal_move_by_enemy((4, 3), left) == False        # is R
+    # Tests passed;
+    # More cases added
+
+### CONTINUE FROM HERE ###
 
 def test_is_legal_move():
     set_board(board1)
