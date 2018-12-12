@@ -297,7 +297,6 @@ def is_saved_game():
 
 def retrieve_file_contents():
     """Reads saved file, assigns contents to list and makes list global."""
-    #if is_saved_game():
     with open('game_data.txt', 'r') as f:
         global f_contents
         f_contents = f.read().splitlines()
@@ -329,37 +328,88 @@ def saved_board():
 
 ###------- Communicating with the user --------
 
-#-------------- Unchanged functions ------------
+#--------- Functions below are new ----------
 
-def print_board():
-    print("    1  2  3  4  5")
-    print("  ---------------")
-    ch = "A"
-    for i in range(0, 5):
-        print(ch, "|", end = " ")
-        for j in range(0, 5):
-            print(board[i][j] + " ", end = " ")
-        print()
-        ch = chr(ord(ch) + 1)
+def save_dialog():
     print()
+    print("Are you sure you want to save and exit the game?")
+    print()
+    answer = ""
+    s = "save the game and exit"
+    if is_saved_game():
+        print('Saving will overwrite save game data from {date}.'.format(date = saved_date()))
+        print()
+        s = "overwrite save game data and exit the game"
+    while answer != "YES" and answer != "NO":
+        answer = input("""Enter YES to {relevant_phrase},
+                 or NO to continue playing: """.format(relevant_phrase = s)).upper()
+        print()
+    if answer == "YES":
+        import datetime
+        date = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now())
+        write_save_file(users_side, date, board)
+        print("Games is saved at {} and will now exit.".format(date))
+        print()
+        print("Come back soon!")
+        return "SAVE"
+    else:
+        print_board()
+        return get_users_move_or_save()
 
-def choose_users_side():
-    """Returns 'M' if user is playing Musketeers, 'R' otherwise."""
-    user = ""
-    while user != 'M' and user != 'R':
-        answer = input("Would you like to play Musketeer (M) or enemy (R)? ")
-        answer = answer.strip()
-        if answer != "":
-            user = answer.upper()[0]
-    return user
+def load_game():
+    """Returns True if the user wishes to load a previously saved game.
+       Returns False if user declines or if there is no save data.
+       Also gives user option to delete saved data."""
+    if is_saved_game():
+        print("Would you like to continue the previous game, saved at {date}?".format(date = saved_date()))
+        print()
+        answer = ""
+        while answer != "YES" and answer != "NO" and answer != "DEL":
+            answer = input("""Enter YES to continue from last save, or NO to start
+            a new game, or DEL to delete saved data: """).upper()
+            print()
+        if answer == "YES":
+            return True
+        elif answer == "DEL":
+            delete_data()
+            print("Data deleted. Starting new game.")
+            print()
+            return False
+    else:
+        return False
 
-def describe_move(who, location, direction):
-    """Prints a sentence describing the given move."""
-    new_location = adjacent_location(location, direction)
-    print(who, 'moves', direction, 'from',\
-          location_to_string(location), 'to',\
-          location_to_string(new_location) + ".\n")
+def instructions_again_perhaps():
+    print("Would you like to read the game instructions again?")
+    print()
+    answer = ""
+    while answer != "YES" and answer != "NO":
+        answer = input("Enter YES or NO: ").upper()
+        print()
+    if answer == "YES":
+        return print_instructions()
+    else:
+        print("No problem. Let's get to it!")
+        print()
+        return
 
+def get_users_move_or_save():
+    """Gets a legal move from the user, and returns it as a
+       (location, direction) tuple. Also allows the user the
+       option to save game state."""
+    directions = {'L':'left', 'R':'right', 'U':'up', 'D':'down'}
+    move = input("Your move? ").upper().replace(' ', '')
+    if move == 'SAVE':
+        return save_dialog()
+    elif (len(move) >= 3
+            and move[0] in 'ABCDE'
+            and move[1] in '12345'
+            and move[2] in 'LRUD'):
+        location = string_to_location(move[0:2])
+        direction = directions[move[2]]
+        if is_legal_move(location, direction):
+            return (location, direction)
+    print("Illegal move--'" + move + "'")
+    return get_users_move_or_save()
 
 #------ Functions below have been amended to accomodate ------
 #------------- saving and loading of game data -------------
@@ -373,8 +423,8 @@ def print_instructions():
     U, or D). For example, to move the Musketeer from the top right-hand
     corner to the row below, enter 'A5 down' (without quotes).""")
     print()
-    print("""You have the option to save the game so that you may return to
-    the board at a later time. You can save any time that it is your move.
+    print("""You have the option to save the game and exit so that you may return
+    to the board at a later time. You can save any time that it is your move.
     To do so, when prompted with 'Your move?', simply reply with 'SAVE'.""")
     print()
     print("For convenience in typing, you may use lowercase letters on any command.")
@@ -442,11 +492,16 @@ def start():
     print_board()
     while True:
         if skip_m_once:
+            # If the game has loaded from a save state where users_side
+            # is R, this if statement skips M on first run of while loop
+            # so that the player can continue from their go
             skip_m_once = False
         else:
             if has_some_legal_move_somewhere('M'):
-                board = move_musketeer(users_side)
+                board = move_musketeer(users_side) # Move piece or save game
                 if board == 'SAVE':
+                    # If board returns as SAVE, this indicates that the board
+                    # has been saved by the user and the program should exit
                     break
                 print_board()
                 if is_enemy_win():
@@ -456,7 +511,7 @@ def start():
                 print("The Musketeers win!")
                 break
         if has_some_legal_move_somewhere('R'):
-            board = move_enemy(users_side)
+            board = move_enemy(users_side)  # Move piece or save game
             if board == 'SAVE':
                 break
             print_board()
@@ -464,85 +519,33 @@ def start():
             print("The Musketeers win!")
             break
 
+#-------------- Unchanged functions ------------
 
-#--------- Functions below are new ----------
-
-def save_dialog():
+def print_board():
+    print("    1  2  3  4  5")
+    print("  ---------------")
+    ch = "A"
+    for i in range(0, 5):
+        print(ch, "|", end = " ")
+        for j in range(0, 5):
+            print(board[i][j] + " ", end = " ")
+        print()
+        ch = chr(ord(ch) + 1)
     print()
-    print("Are you sure you want to save and exit the game?")
-    print()
-    answer = ""
-    s = "save the game and exit"
-    if is_saved_game():
-        print('Saving will overwrite save game data from {}.'.format(saved_date()))
-        print()
-        s = "overwrite save game data and exit the game"
-    while answer != "YES" and answer != "NO":
-        answer = input("""Enter YES to {},
-                 or NO to continue playing: """.format(s)).upper()
-        print()
-    if answer == "YES":
-        import datetime
-        date = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now())
-        write_save_file(users_side, date, board)
-        print("Games is saved at {} and will now exit.".format(date))
-        print()
-        print("Come back soon!")
-        return "SAVE"
-    else:
-        print_board()
-        return get_users_move_or_save()
 
-def load_game():
-    """Returns True if the user wishes to load a previously saved game.
-       Returns False if user declines or if there is no save data.
-       Also gives user option to delete saved data."""
-    if is_saved_game():
-        print("Would you like to continue the previous game, saved at {date}?".format(date = saved_date()))
-        print()
-        answer = ""
-        while answer != "YES" and answer != "NO" and answer != "DEL":
-            answer = input("""Enter YES to continue from last save, or NO to start
-            a new game, or DEL to delete saved data: """).upper()
-            print()
-        if answer == "YES":
-            return True
-        elif answer == "DEL":
-            delete_data()
-            print("Data deleted. Starting new game.")
-            print()
-            return False
-    else:
-        return False
+def choose_users_side():
+    """Returns 'M' if user is playing Musketeers, 'R' otherwise."""
+    user = ""
+    while user != 'M' and user != 'R':
+        answer = input("Would you like to play Musketeer (M) or enemy (R)? ")
+        answer = answer.strip()
+        if answer != "":
+            user = answer.upper()[0]
+    return user
 
-def instructions_again_perhaps():
-    print("Would you like to read the game instructions again?")
-    print()
-    answer = ""
-    while answer != "YES" and answer != "NO":
-        answer = input("Enter YES or NO: ").upper()
-        print()
-    if answer == "YES":
-        return print_instructions()
-    else:
-        print("No problem. Let's get to it!")
-        return
-
-def get_users_move_or_save():
-    """Gets a legal move from the user, and returns it as a
-       (location, direction) tuple. Also allows the user the
-       option to save game state."""
-    directions = {'L':'left', 'R':'right', 'U':'up', 'D':'down'}
-    move = input("Your move? ").upper().replace(' ', '')
-    if move == 'SAVE':
-        return save_dialog()
-    elif (len(move) >= 3
-            and move[0] in 'ABCDE'
-            and move[1] in '12345'
-            and move[2] in 'LRUD'):
-        location = string_to_location(move[0:2])
-        direction = directions[move[2]]
-        if is_legal_move(location, direction):
-            return (location, direction)
-    print("Illegal move--'" + move + "'")
-    return get_users_move_or_save()
+def describe_move(who, location, direction):
+    """Prints a sentence describing the given move."""
+    new_location = adjacent_location(location, direction)
+    print(who, 'moves', direction, 'from',\
+          location_to_string(location), 'to',\
+          location_to_string(new_location) + ".\n")
