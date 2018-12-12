@@ -263,47 +263,68 @@ def is_enemy_win():
     return False
 
 
-
 #------------- Files functions -------------
 #--These functions handle saving and loading of game data
 #-------------------------------------------
 
-def is_saved_game():
-    """Checks if there is any saved data and returns True or False"""
-    return True
-
-def saved_date():
-    """Returns the date/time from the save file."""
-    date = "01-05-2020 12:00:33"
-    return date
-
-
-def saved_board():
-    """Returns the board from the save file."""
-    global board
-    _ = "-"
-    m = 'M'
-    r = 'R'
-    board = [ [r, _, r, r, _],
-              [r, m, _, r, m],
-              [_, _, _, _, r],
-              [r, r, r, r, r],
-              [_, _, m, _, r] ]
-    return board
-
-def saved_player():
-    """Returns the saved user (users_side) from the saved data"""
-    user = 'M'
-    return user
-
-def write_save_file(user, board, date):
-    """Creates a save file is one does not exist. Wrires the current
-    user's side, board and date/time to the file."""
-    pass
+def write_save_file(user, date, board):
+    """Writes the current user's side, board and date/time to a file.
+       If a file already exists, it overwrites it."""
+    with open('game_data.txt', 'w') as f:
+        # Write strings to first two lines of file
+        new_contents = "{}\n{}\n".format(user, date)
+        f.write(new_contents)
+        # Then write board contents in one line
+        for row in range(5):
+            for column in range(5):
+                f.write(board[row][column])
 
 def delete_data():
     """Deletes the saved file."""
+    import os
+    os.remove("game_data.txt")
     pass
+
+def is_saved_game():
+    """Checks if there is a game data file and returns True or False
+       (handling exceptions)."""
+    try:
+        f = open('game_data.txt')
+        f.close()
+        return True
+    except IOError:
+        return False
+
+def retrieve_file_contents():
+    """Reads saved file, assigns contents to list and makes list global."""
+    #if is_saved_game():
+    with open('game_data.txt', 'r') as f:
+        global f_contents
+        f_contents = f.read().splitlines()
+
+def saved_player():
+    """Returns the saved user (users_side) from the saved data"""
+    retrieve_file_contents()
+    user = f_contents[0]
+    return user
+
+def saved_date():
+    """Returns the date/time from the save file."""
+    retrieve_file_contents()
+    date = f_contents[1]
+    return date
+
+def saved_board():
+    """Makes board global. Returns the board from the save file."""
+    global board
+    retrieve_file_contents()
+    board_string = f_contents[2]
+    saved_board = [[],[],[],[],[]]
+    for row in range(5):
+        for column in range(5):
+            saved_board[row].append(board_string[column+(5*row)])
+    board = saved_board
+    return board
 
 
 ###------- Communicating with the user --------
@@ -323,21 +344,21 @@ def print_board():
     print()
 
 def choose_users_side():
-"""Returns 'M' if user is playing Musketeers, 'R' otherwise."""
-user = ""
-while user != 'M' and user != 'R':
-    answer = input("Would you like to play Musketeer (M) or enemy (R)? ")
-    answer = answer.strip()
-    if answer != "":
-        user = answer.upper()[0]
-return user
+    """Returns 'M' if user is playing Musketeers, 'R' otherwise."""
+    user = ""
+    while user != 'M' and user != 'R':
+        answer = input("Would you like to play Musketeer (M) or enemy (R)? ")
+        answer = answer.strip()
+        if answer != "":
+            user = answer.upper()[0]
+    return user
 
 def describe_move(who, location, direction):
-"""Prints a sentence describing the given move."""
-new_location = adjacent_location(location, direction)
-print(who, 'moves', direction, 'from',\
-      location_to_string(location), 'to',\
-      location_to_string(new_location) + ".\n")
+    """Prints a sentence describing the given move."""
+    new_location = adjacent_location(location, direction)
+    print(who, 'moves', direction, 'from',\
+          location_to_string(location), 'to',\
+          location_to_string(new_location) + ".\n")
 
 
 #------ Functions below have been amended to accomodate ------
@@ -350,33 +371,14 @@ def print_instructions():
     letter (A, B, C, D, or E) followed by an integer (1, 2, 3, 4, or 5).
     Directions are indicated as left, right, up, or down (or simply L, R,
     U, or D). For example, to move the Musketeer from the top right-hand
-    corner to the row below, enter 'A5 down' (without quotes).
-    For convenience in typing, you may use lowercase letters.""")
+    corner to the row below, enter 'A5 down' (without quotes).""")
     print()
     print("""You have the option to save the game so that you may return to
     the board at a later time. You can save any time that it is your move.
-    To do so, when prompted with 'Your move?', simply reply with 'SAVE' """)
+    To do so, when prompted with 'Your move?', simply reply with 'SAVE'.""")
     print()
-
-
-def get_users_move_or_save():
-    """Gets a legal move from the user, and returns it as a
-       (location, direction) tuple. Also allows the user the
-       option to save game state."""
-    directions = {'L':'left', 'R':'right', 'U':'up', 'D':'down'}
-    move = input("Your move? ").upper().replace(' ', '')
-    if move == 'SAVE':
-        return save_dialog()
-    elif (len(move) >= 3
-            and move[0] in 'ABCDE'
-            and move[1] in '12345'
-            and move[2] in 'LRUD'):
-        location = string_to_location(move[0:2])
-        direction = directions[move[2]]
-        if is_legal_move(location, direction):
-            return (location, direction)
-    print("Illegal move--'" + move + "'")
-    return get_users_move_or_save()
+    print("For convenience in typing, you may use lowercase letters on any command.")
+    print()
 
 def move_musketeer(users_side):
     """Gets the Musketeer's move (from either the user or the computer)
@@ -424,29 +426,35 @@ def move_enemy(users_side):
 def start():
     """Plays the Three Musketeers Game."""
     global users_side
+    skip_m_once = False
     if load_game():
         users_side = saved_player()
         board = saved_board()
         print('You are playing as {}'.format(users_side))
         print()
         instructions_again_perhaps()
+        if users_side == 'R':
+            skip_m_once = True
     else:
         users_side = choose_users_side()
         board = create_board()
         print_instructions()
     print_board()
     while True:
-        if has_some_legal_move_somewhere('M'):
-            board = move_musketeer(users_side)
-            if board == 'SAVE':
-                break
-            print_board()
-            if is_enemy_win():
-                print("Cardinal Richleau's men win!")
-                break
+        if skip_m_once:
+            skip_m_once = False
         else:
-            print("The Musketeers win!")
-            break
+            if has_some_legal_move_somewhere('M'):
+                board = move_musketeer(users_side)
+                if board == 'SAVE':
+                    break
+                print_board()
+                if is_enemy_win():
+                    print("Cardinal Richleau's men win!")
+                    break
+            else:
+                print("The Musketeers win!")
+                break
         if has_some_legal_move_somewhere('R'):
             board = move_enemy(users_side)
             if board == 'SAVE':
@@ -460,6 +468,7 @@ def start():
 #--------- Functions below are new ----------
 
 def save_dialog():
+    print()
     print("Are you sure you want to save and exit the game?")
     print()
     answer = ""
@@ -475,12 +484,13 @@ def save_dialog():
     if answer == "YES":
         import datetime
         date = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now())
-        write_save_file(users_side, board, date)
-        print("Games is saved at {} and will now exit.".format(time))
+        write_save_file(users_side, date, board)
+        print("Games is saved at {} and will now exit.".format(date))
         print()
         print("Come back soon!")
         return "SAVE"
     else:
+        print_board()
         return get_users_move_or_save()
 
 def load_game():
@@ -517,3 +527,22 @@ def instructions_again_perhaps():
     else:
         print("No problem. Let's get to it!")
         return
+
+def get_users_move_or_save():
+    """Gets a legal move from the user, and returns it as a
+       (location, direction) tuple. Also allows the user the
+       option to save game state."""
+    directions = {'L':'left', 'R':'right', 'U':'up', 'D':'down'}
+    move = input("Your move? ").upper().replace(' ', '')
+    if move == 'SAVE':
+        return save_dialog()
+    elif (len(move) >= 3
+            and move[0] in 'ABCDE'
+            and move[1] in '12345'
+            and move[2] in 'LRUD'):
+        location = string_to_location(move[0:2])
+        direction = directions[move[2]]
+        if is_legal_move(location, direction):
+            return (location, direction)
+    print("Illegal move--'" + move + "'")
+    return get_users_move_or_save()
