@@ -1,0 +1,22 @@
+Total coursework mark: 19.7  (out of 20)
+
+Exercise sheets mark:  10  (out of 10)
+
+Project mark:  9.7  (out of 10)
+
+Project feedback and mark details
+
+Correctness and adherence to specification:  30%  (out of 30%)
+The program runs correctly and adheres to specifications provided
+
+Completeness of code, tests, and commit history:  30%    (out of 30%)   
+Implementation is complete
+Tests are passing and have adequate coverage
+Commit history is healthy
+
+Coding style: 10%   (out of 10%) 
+Coding style is OK
+
+Extension: 27%     (out of 30%) 
+
+Extensions have been provided. The file is saved by overwrite and loaded. It would have been good to have multiple files or game saves and specified file names.
